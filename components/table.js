@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {StyleSheet, View, ScrollView, TextInput} from 'react-native';
-import {Table, TableWrapper, Row} from 'react-native-table-component';
+import {Table, Row} from 'react-native-table-component';
 
 const numColumns = 6;
 const numRows = 10;
@@ -41,7 +41,7 @@ export default class ExampleThree extends Component {
                 data={state.tableHead}
                 widthArr={state.widthArr}
                 style={styles.header}
-                textStyle={styles.text}
+                textStyle={{...styles.text}}
               />
             </Table>
             <ScrollView style={styles.dataWrapper}>
@@ -51,8 +51,8 @@ export default class ExampleThree extends Component {
                     key={index}
                     data={rowData}
                     widthArr={state.widthArr}
-                    style={[styles.row]}
-                    textStyle={styles.text}
+                    style={styles.row}
+                    textStyle={{...styles.text}}
                   />
                 ))}
               </Table>
