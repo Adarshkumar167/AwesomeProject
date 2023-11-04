@@ -66,14 +66,13 @@ export default class ExampleThree extends Component {
     for (let i = 1; i <= numRows; i++) {
       const rowData = [];
       for (let j = 1; j < this.state.tableHead.length; j++) {
-        const cellId = this.state.tableHead[j] + i;
-        const value = await AsyncStorage.getItem(cellId);
+        const value = await AsyncStorage.getItem(this.state.tableHead[j] + i);
         rowData.push(value || '');
       }
       data.push(rowData);
     }
     let wb = XLSX.utils.book_new();
-    let ws = XLSX.utils.json_to_sheet(data);
+    let ws = XLSX.utils.aoa_to_sheet(data);
     XLSX.utils.book_append_sheet(wb, ws, 'Users');
     const wbout = XLSX.write(wb, {type: 'binary', bookType: 'xlsx'});
 
@@ -104,6 +103,10 @@ export default class ExampleThree extends Component {
     const colIndex = cellId.charCodeAt(0) - 64;
 
     const tableData = [...this.state.tableData];
+
+    if (!Array.isArray(tableData[rowIndex])) {
+      tableData[rowIndex] = [];
+    }
 
     tableData[rowIndex][colIndex] = (
       <TextInput
