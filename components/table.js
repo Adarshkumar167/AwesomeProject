@@ -17,52 +17,6 @@ import XLSX from 'xlsx';
 const numColumns = 6;
 const numRows = 10;
 
-const handleClick = async () => {
-  try {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-      {
-        title: 'Storage Permission',
-        message: 'This app needs storage permission to export data.',
-        buttonNeutral: 'Ask me',
-        buttonNegative: 'Cancel',
-        buttonPositive: 'OK',
-      },
-    );
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      exportDataToExcel();
-      console.log('Permission Granted');
-    } else {
-      exportDataToExcel();
-      console.log('Permission Denied');
-    }
-  } catch (e) {
-    console.error('Error:', e);
-  }
-};
-
-const exportDataToExcel = () => {
-  let smaple_data_to_export = [
-    {
-      id: '1',
-      name: 'adarsh',
-      secret: '12345678',
-    },
-  ];
-  let wb = XLSX.utils.book_new();
-  let ws = XLSX.utils.json_to_sheet(smaple_data_to_export);
-  XLSX.utils.book_append_sheet(wb, ws, 'Users');
-  const wbout = XLSX.write(wb, {type: 'binary', bookType: 'xlsx'});
-
-  writeFile(DownloadDirectoryPath + '/dat.xlsx', wbout, 'ascii')
-    .then(res => {
-      Alert.alert('Export Data Successfully...');
-    })
-    .catch(e => {
-      console.log('Error writeFile', e);
-    });
-};
-
 export default class ExampleThree extends Component {
   constructor(props) {
     super(props);
@@ -108,6 +62,33 @@ export default class ExampleThree extends Component {
     }
   };
 
+  exportDataToExcel = async () => {
+    const data = [];
+    for (let i = 2; i <= numRows; i++) {
+      // Start from the second row to skip the first row
+      const rowData = [];
+      for (let j = 1; j < this.state.tableHead.length; j++) {
+        const cellId = this.state.tableHead[j] + i;
+        const value = await AsyncStorage.getItem(cellId);
+
+        rowData.push(value || ''); // Use the stored value or an empty string if no value is found
+      }
+      data.push(rowData);
+    }
+    let wb = XLSX.utils.book_new();
+    let ws = XLSX.utils.json_to_sheet(data);
+    XLSX.utils.book_append_sheet(wb, ws, 'Users');
+    const wbout = XLSX.write(wb, {type: 'binary', bookType: 'xlsx'});
+
+    writeFile(DownloadDirectoryPath + '/dat.xlsx', wbout, 'ascii')
+      .then(res => {
+        Alert.alert('Export Data Successfully...');
+      })
+      .catch(e => {
+        console.log('Error writeFile', e);
+      });
+  };
+
   onChangeText = (text, cellId) => {
     this.saveData(text, cellId);
     this.updateData(text, cellId);
@@ -137,6 +118,29 @@ export default class ExampleThree extends Component {
       />
     );
     this.setState({tableData});
+  };
+
+  handleClick = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'Storage Permission',
+          message: 'This app needs storage permission to export data.',
+          buttonNeutral: 'Ask me',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === 'never_ask_again') {
+        this.exportDataToExcel();
+        console.log('Permission Granted');
+      } else {
+        console.log('Permission Denied');
+      }
+    } catch (e) {
+      console.error('Error:', e);
+    }
   };
 
   render() {
@@ -170,7 +174,7 @@ export default class ExampleThree extends Component {
           </View>
         </ScrollView>
         <TouchableOpacity
-          onPress={() => handleClick()}
+          onPress={() => this.handleClick()}
           style={{
             width: '27%',
             paddingVertical: 10,
