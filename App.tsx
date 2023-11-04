@@ -1,13 +1,13 @@
 import React from 'react';
-import {View, ScrollView, StyleSheet} from 'react-native';
-import ExampleOne from './components/table';
+import {ScrollView, StyleSheet} from 'react-native';
 import Navbar from './components/navbar';
+import ExampleThree from './components/table';
 
 const App = () => {
   return (
     <ScrollView style={styles.scrollView}>
       <Navbar onDownloadClick={undefined} />
-      <ExampleOne />
+      <ExampleThree />
     </ScrollView>
   );
 };
