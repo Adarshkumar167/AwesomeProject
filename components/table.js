@@ -1,10 +1,68 @@
 import React, {Component} from 'react';
-import {StyleSheet, View, ScrollView, TextInput} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  TextInput,
+  Text,
+  TouchableOpacity,
+  PermissionsAndroid,
+  Alert,
+} from 'react-native';
 import {Table, Row} from 'react-native-table-component';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {writeFile, readFile, DownloadDirectoryPath} from 'react-native-fs';
+import XLSX from 'xlsx';
 
 const numColumns = 6;
 const numRows = 10;
+
+const handleClick = async () => {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      {
+        title: 'Storage Permission',
+        message: 'This app needs storage permission to export data.',
+        buttonNeutral: 'Ask me',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      },
+    );
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      exportDataToExcel();
+      console.log('Permission Granted');
+    } else {
+      exportDataToExcel();
+      console.log('Permission Denied');
+    }
+  } catch (e) {
+    console.error('Error:', e);
+    exportDataToExcel();
+  }
+};
+
+const exportDataToExcel = () => {
+  let smaple_data_to_export = [
+    {
+      id: '1',
+      name: 'adarsh',
+      secret: '12345678',
+    },
+  ];
+  let wb = XLSX.utils.book_new();
+  let ws = XLSX.utils.json_to_sheet(smaple_data_to_export);
+  XLSX.utils.book_append_sheet(wb, ws, 'Users');
+  const wbout = XLSX.write(wb, {type: 'binary', bookType: 'xlsx'});
+
+  writeFile(DownloadDirectoryPath + '/dat.xlsx', wbout, 'ascii')
+    .then(res => {
+      Alert.alert('Export Data Successfully...');
+    })
+    .catch(e => {
+      console.log('Error writeFile', e);
+    });
+};
 
 export default class ExampleThree extends Component {
   constructor(props) {
@@ -112,6 +170,9 @@ export default class ExampleThree extends Component {
             </ScrollView>
           </View>
         </ScrollView>
+        <TouchableOpacity onPress={() => handleClick()}>
+          <Text>Export to Excel</Text>
+        </TouchableOpacity>
       </View>
     );
   }
