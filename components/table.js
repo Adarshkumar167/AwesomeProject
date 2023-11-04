@@ -38,7 +38,6 @@ const handleClick = async () => {
     }
   } catch (e) {
     console.error('Error:', e);
-    exportDataToExcel();
   }
 };
 
@@ -170,8 +169,17 @@ export default class ExampleThree extends Component {
             </ScrollView>
           </View>
         </ScrollView>
-        <TouchableOpacity onPress={() => handleClick()}>
-          <Text>Export to Excel</Text>
+        <TouchableOpacity
+          onPress={() => handleClick()}
+          style={{
+            width: '27%',
+            paddingVertical: 10,
+            paddingHorizontal: 15,
+            backgroundColor: 'blue',
+            marginVertical: 50,
+            borderRadius: 5,
+          }}>
+          <Text>Download</Text>
         </TouchableOpacity>
       </View>
     );
