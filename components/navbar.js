@@ -5,9 +5,6 @@ const Navbar = ({onDownloadClick}) => {
   return (
     <View style={styles.navbar}>
       <Text style={styles.navbarTitle}>Excel</Text>
-      <TouchableOpacity style={styles.downloadButton} onPress={onDownloadClick}>
-        <Text style={styles.buttonText}>Download</Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -24,17 +21,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: 'black',
-  },
-  downloadButton: {
-    backgroundColor: 'blue',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });
 
