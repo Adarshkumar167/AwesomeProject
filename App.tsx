@@ -6,8 +6,7 @@ import ExampleThree from './components/table';
 const App = () => {
   return (
     <ScrollView style={styles.scrollView}>
-      <Navbar onDownloadClick={undefined} />
-      <ExampleThree />
+      <ExampleThree Navbar={Navbar} />
     </ScrollView>
   );
 };

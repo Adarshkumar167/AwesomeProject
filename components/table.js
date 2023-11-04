@@ -4,14 +4,12 @@ import {
   View,
   ScrollView,
   TextInput,
-  Text,
-  TouchableOpacity,
   PermissionsAndroid,
   Alert,
 } from 'react-native';
 import {Table, Row} from 'react-native-table-component';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {writeFile, readFile, DownloadDirectoryPath} from 'react-native-fs';
+import {writeFile, DownloadDirectoryPath} from 'react-native-fs';
 import XLSX from 'xlsx';
 
 const numColumns = 6;
@@ -29,6 +27,7 @@ export default class ExampleThree extends Component {
       widthArr: Array(numColumns).fill(100),
       tableData: [],
     };
+    this.handleClick = this.handleClick.bind(this);
   }
 
   componentDidMount() {
@@ -80,7 +79,7 @@ export default class ExampleThree extends Component {
 
     writeFile(DownloadDirectoryPath + '/dat.xlsx', wbout, 'ascii')
       .then(res => {
-        Alert.alert('Export Data Successfully...');
+        Alert.alert('Export Data Successfully');
       })
       .catch(e => {
         console.log('Error writeFile', e);
@@ -117,7 +116,6 @@ export default class ExampleThree extends Component {
     );
     this.setState({tableData});
   };
-
   handleClick = async () => {
     try {
       const granted = await PermissionsAndroid.request(
@@ -146,53 +144,52 @@ export default class ExampleThree extends Component {
 
   render() {
     const state = this.state;
+    const {Navbar} = this.props;
 
     return (
       <View style={styles.container}>
-        <ScrollView horizontal={true}>
-          <View>
-            <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-              <Row
-                data={state.tableHead}
-                widthArr={state.widthArr}
-                style={styles.header}
-                textStyle={{...styles.text}}
-              />
-            </Table>
-            <ScrollView style={styles.dataWrapper}>
+        <View style={styles.navbarContainer}>
+          <Navbar onDownloadClick={this.handleClick} />
+        </View>
+        <View style={styles.scrollViewContainer}>
+          <ScrollView horizontal={true}>
+            <View>
               <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-                {state.tableData.map((rowData, index) => (
-                  <Row
-                    key={index}
-                    data={rowData}
-                    widthArr={state.widthArr}
-                    style={styles.row}
-                    textStyle={{...styles.text}}
-                  />
-                ))}
+                <Row
+                  data={state.tableHead}
+                  widthArr={state.widthArr}
+                  style={styles.header}
+                  textStyle={styles.text}
+                />
               </Table>
-            </ScrollView>
-          </View>
-        </ScrollView>
-        <TouchableOpacity
-          onPress={() => this.handleClick()}
-          style={{
-            width: '27%',
-            paddingVertical: 10,
-            paddingHorizontal: 15,
-            backgroundColor: 'blue',
-            marginVertical: 50,
-            borderRadius: 5,
-          }}>
-          <Text>Download</Text>
-        </TouchableOpacity>
+              <ScrollView style={styles.dataWrapper}>
+                <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
+                  {state.tableData.map((rowData, index) => (
+                    <Row
+                      key={index}
+                      data={rowData}
+                      widthArr={state.widthArr}
+                      style={styles.row}
+                      textStyle={styles.text}
+                    />
+                  ))}
+                </Table>
+              </ScrollView>
+            </View>
+          </ScrollView>
+        </View>
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: {flex: 1, padding: 16, paddingTop: 30},
+  container: {flex: 1},
+  navbarContainer: {},
+  scrollViewContainer: {
+    padding: 16,
+    paddingTop: 30,
+  },
   header: {height: 30, backgroundColor: 'lightgrey'},
   text: {textAlign: 'center', fontWeight: '200', color: 'black', fontSize: 15},
   row: {height: 30},
