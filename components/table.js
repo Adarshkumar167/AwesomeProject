@@ -64,14 +64,12 @@ export default class ExampleThree extends Component {
 
   exportDataToExcel = async () => {
     const data = [];
-    for (let i = 2; i <= numRows; i++) {
-      // Start from the second row to skip the first row
+    for (let i = 1; i <= numRows; i++) {
       const rowData = [];
       for (let j = 1; j < this.state.tableHead.length; j++) {
         const cellId = this.state.tableHead[j] + i;
         const value = await AsyncStorage.getItem(cellId);
-
-        rowData.push(value || ''); // Use the stored value or an empty string if no value is found
+        rowData.push(value || '');
       }
       data.push(rowData);
     }
@@ -132,7 +130,10 @@ export default class ExampleThree extends Component {
           buttonPositive: 'OK',
         },
       );
-      if (granted === 'never_ask_again') {
+      if (
+        granted === 'never_ask_again' ||
+        granted === PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+      ) {
         this.exportDataToExcel();
         console.log('Permission Granted');
       } else {
