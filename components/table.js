@@ -6,6 +6,7 @@ import {
   TextInput,
   PermissionsAndroid,
   Alert,
+  Dimensions,
 } from 'react-native';
 import {Table, Row} from 'react-native-table-component';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,7 +19,6 @@ const numRows = 10;
 export default class ExampleThree extends Component {
   constructor(props) {
     super(props);
-
     const tableHead = Array.from({length: numColumns}, (_, i) =>
       i === 0 ? '' : String.fromCharCode(64 + i),
     );
@@ -28,6 +28,17 @@ export default class ExampleThree extends Component {
       tableData: [],
     };
     this.handleClick = this.handleClick.bind(this);
+    const {width, height} = Dimensions.get('window');
+    this.screenWidth = width;
+    this.screenHeight = height;
+  }
+
+  calculateCellWidth() {
+    return (this.screenWidth - 32) / numColumns;
+  }
+
+  calculateCellHeight() {
+    return (this.screenHeight - 500) / numRows;
   }
 
   componentDidMount() {
@@ -42,11 +53,16 @@ export default class ExampleThree extends Component {
         for (let j = 1; j < this.state.tableHead.length; j++) {
           const cellId = this.state.tableHead[j] + i;
           const value = await AsyncStorage.getItem(cellId);
-
           rowData.push(
             <TextInput
               key={j}
-              style={styles.input}
+              style={[
+                styles.input,
+                {
+                  width: this.calculateCellWidth(),
+                  height: this.calculateCellHeight(),
+                },
+              ]}
               editable={true}
               value={value}
               onChangeText={text => this.onChangeText(text, cellId)}
@@ -75,7 +91,6 @@ export default class ExampleThree extends Component {
     let ws = XLSX.utils.aoa_to_sheet(data);
     XLSX.utils.book_append_sheet(wb, ws, 'Users');
     const wbout = XLSX.write(wb, {type: 'binary', bookType: 'xlsx'});
-
     writeFile(DownloadDirectoryPath + '/dat.xlsx', wbout, 'ascii')
       .then(res => {
         Alert.alert('Export Data Successfully');
@@ -119,6 +134,7 @@ export default class ExampleThree extends Component {
     );
     this.setState({tableData});
   };
+
   handleClick = async () => {
     try {
       const granted = await PermissionsAndroid.request(
@@ -148,7 +164,6 @@ export default class ExampleThree extends Component {
   render() {
     const state = this.state;
     const {Navbar} = this.props;
-
     return (
       <View style={styles.container}>
         <View style={styles.navbarContainer}>
@@ -161,7 +176,7 @@ export default class ExampleThree extends Component {
                 <Row
                   data={state.tableHead}
                   widthArr={state.widthArr}
-                  style={styles.header}
+                  style={[styles.header, {height: this.calculateCellHeight()}]}
                   textStyle={styles.text}
                 />
               </Table>
@@ -172,7 +187,7 @@ export default class ExampleThree extends Component {
                       key={index}
                       data={rowData}
                       widthArr={state.widthArr}
-                      style={styles.row}
+                      style={[styles.row, {height: this.calculateCellHeight()}]}
                       textStyle={styles.text}
                     />
                   ))}
@@ -193,9 +208,9 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingTop: 30,
   },
-  header: {height: 30, backgroundColor: 'lightgrey'},
+  header: {backgroundColor: 'lightgrey'},
   text: {textAlign: 'center', fontWeight: '200', color: 'black', fontSize: 15},
-  row: {height: 30},
+  row: {},
   input: {
     flex: 1,
     textAlign: 'center',
